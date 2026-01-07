@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function() {
   const activitiesList = document.getElementById("activities-list");
   const activitySelect = document.getElementById("activity");
   const signupForm = document.getElementById("signup-form");
@@ -20,11 +20,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const spotsLeft = details.max_participants - details.participants.length;
 
+        // Participants section
+        let participantsSection = "";
+        if (details.participants.length > 0) {
+          participantsSection = `
+            <div class="activity-participants">
+              <strong>Participants:</strong>
+              <ul>
+                ${details.participants.map(email => `<li style="display: flex; align-items: center;">${email}<button style="margin-left: 8px; background: none; border: none; cursor: pointer; font-size: 1em;" aria-label="Delete participant" onclick="removeParticipant(this)">🗑️</button></li>`).join("")}
+              </ul>
+            </div>
+          `;
+        } else {
+          participantsSection = `
+            <div class="activity-participants empty">
+              No participants yet.
+            </div>
+          `;
+        }
+
         activityCard.innerHTML = `
           <h4>${name}</h4>
           <p>${details.description}</p>
           <p><strong>Schedule:</strong> ${details.schedule}</p>
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
+          ${participantsSection}
         `;
 
         activitiesList.appendChild(activityCard);
@@ -62,6 +82,8 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDiv.textContent = result.message;
         messageDiv.className = "success";
         signupForm.reset();
+        // Refresh activities list to show new participant
+        await fetchActivities();
       } else {
         messageDiv.textContent = result.detail || "An error occurred";
         messageDiv.className = "error";
@@ -84,3 +106,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize app
   fetchActivities();
 });
+
+function removeParticipant(button) {
+  const li = button.parentElement;
+  li.parentElement.removeChild(li);
+}
