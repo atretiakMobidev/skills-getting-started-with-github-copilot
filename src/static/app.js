@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function() {
   const activitiesList = document.getElementById("activities-list");
   const activitySelect = document.getElementById("activity");
   const signupForm = document.getElementById("signup-form");
@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="activity-participants">
               <strong>Participants:</strong>
               <ul>
-                ${details.participants.map(email => `<li>${email}</li>`).join("")}
+                ${details.participants.map(email => `<li style="display: flex; align-items: center;">${email}<button style="margin-left: 8px; background: none; border: none; cursor: pointer; font-size: 1em;" aria-label="Delete participant" onclick="removeParticipant(this)">🗑️</button></li>`).join("")}
               </ul>
             </div>
           `;
@@ -82,6 +82,8 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDiv.textContent = result.message;
         messageDiv.className = "success";
         signupForm.reset();
+        // Refresh activities list to show new participant
+        await fetchActivities();
       } else {
         messageDiv.textContent = result.detail || "An error occurred";
         messageDiv.className = "error";
@@ -104,3 +106,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize app
   fetchActivities();
 });
+
+function removeParticipant(button) {
+  const li = button.parentElement;
+  li.parentElement.removeChild(li);
+}
